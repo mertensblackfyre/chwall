@@ -4,11 +4,7 @@ let
 in
   pkgs.mkShell {
     packages = [
-     pkgs.gdb
-     pkgs.gcc
-    pkgs.pkg-config
-    pkgs.meson
-    pkgs.ninja
+     pkgs.go
 
 ];
 }
