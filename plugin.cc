@@ -18,6 +18,7 @@ struct mpv_curr_info {
 } typedef mpv_curr_info;
 
 extern "C" int mpv_open_cplugin(mpv_handle *handle) {
+
   mpv_observe_property(handle, PROP_TITLE, "media-title", MPV_FORMAT_STRING);
   mpv_observe_property(handle, PROP_PAUSE, "pause", MPV_FORMAT_FLAG);
   mpv_observe_property(handle, PROP_IDLE, "idle-active", MPV_FORMAT_FLAG);
@@ -45,25 +46,21 @@ extern "C" int mpv_open_cplugin(mpv_handle *handle) {
       if (prop->format == MPV_FORMAT_STRING) {
         auto *s = *static_cast<const char *const *>(prop->data);
         info.title = s ? s : "";
-        fmt::println("title: {}", info.title);
       }
       break;
     case PROP_PAUSE:
       if (prop->format == MPV_FORMAT_FLAG) {
         info.paused = (*static_cast<const int *>(prop->data)) != 0;
-        fmt::println("paused: {}", info.paused);
       }
       break;
     case PROP_IDLE:
       if (prop->format == MPV_FORMAT_FLAG) {
         info.idle_active = (*static_cast<const int *>(prop->data)) != 0;
-        fmt::println("idle: {}", info.idle_active);
       }
       break;
     case PROP_DURATION:
       if (prop->format == MPV_FORMAT_DOUBLE && prop->data) {
         info.duration = *static_cast<const double *>(prop->data);
-        fmt::println("duration: {:.1f}s", *static_cast<const double *>(prop->data));
       } else if (prop->format == MPV_FORMAT_NONE) {
         info.duration = 0.0;
       }
@@ -71,7 +68,6 @@ extern "C" int mpv_open_cplugin(mpv_handle *handle) {
     case PROP_TIME_POS:
       if (prop->format == MPV_FORMAT_DOUBLE && prop->data) {
         info.time_pos = *static_cast<const double *>(prop->data);
-        fmt::println("time_pos: {:.1f}s", *static_cast<const double *>(prop->data));
       } else if (prop->format == MPV_FORMAT_NONE) {
         info.time_pos = 0.0;
       }
