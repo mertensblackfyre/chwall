@@ -2,3 +2,6 @@ a.out
 a.mkv
 *.so
 test_discord
+discord_test
+build
+.cache
