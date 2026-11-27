@@ -1,23 +1,13 @@
+#include "../include/connection.h"
+#include "../include/discord.h"
+#include "../include/utils.h"
 #include <cstdlib>
 #include <fmt/base.h>
 #include <mpv/client.h>
 #include <string>
 
-enum prop : uint64_t {
-  PROP_TITLE = 1,
-  PROP_PAUSE = 2,
-  PROP_IDLE = 3,
-  PROP_DURATION = 4,
-  PROP_TIME_POS = 5
-};
-
-struct mpv_curr_info {
-  std::string title;
-  bool paused = false, idle_active = false;
-  double duration = 0.0, time_pos = 0.0;
-} typedef mpv_curr_info;
-
 extern "C" int mpv_open_cplugin(mpv_handle *handle) {
+  UnixSocket sock;
 
   mpv_observe_property(handle, PROP_TITLE, "media-title", MPV_FORMAT_STRING);
   mpv_observe_property(handle, PROP_PAUSE, "pause", MPV_FORMAT_FLAG);
@@ -25,7 +15,10 @@ extern "C" int mpv_open_cplugin(mpv_handle *handle) {
   mpv_observe_property(handle, PROP_DURATION, "duration", MPV_FORMAT_DOUBLE);
   mpv_observe_property(handle, PROP_TIME_POS, "time-pos", MPV_FORMAT_DOUBLE);
 
-  mpv_curr_info info;
+  MPV_INFO info;
+
+  discord_rpc_handshake(&sock);
+
   while (true) {
     mpv_event *event = mpv_wait_event(handle, -1);
     if (!event)
@@ -72,6 +65,9 @@ extern "C" int mpv_open_cplugin(mpv_handle *handle) {
         info.time_pos = 0.0;
       }
       break;
+    }
+    if (sock.state == ConnectionState::Ready) {
+      discord_rpc_set_activity(&sock, info);
     }
   }
   return EXIT_SUCCESS;
